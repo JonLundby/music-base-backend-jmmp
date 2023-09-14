@@ -7,7 +7,7 @@ const connection = mysql2.createConnection({
   port: 3306,
   user: "root",
   database: "artists_db", // todo set db name
-  password: "@S4t4nT4ng0Z#85", //todo set password
+  password: "", //todo set password
   multipleStatements: true,
 });
 
