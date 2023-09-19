@@ -1,8 +1,7 @@
 // ===== IMPORTS ===== //
 import express from "express";
-import fs from "fs/promises";
 import cors from "cors";
-import connection from "./database.js";
+
 // Imports from routes
 import tracksRouter from "./routes/tracks.js";
 
