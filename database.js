@@ -11,4 +11,12 @@ const connection = mysql2.createConnection({
     multipleStatements: true,
 });
 
+connection.connect((err) => {
+    if (err) {
+        console.error("Fejl ved oprettelse af forbindelse til database: " + err);
+    } else {
+        console.log("Forbindelse til database er oprettet.");
+    }
+});
+
 export default connection;
