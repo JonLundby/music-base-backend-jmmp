@@ -43,8 +43,8 @@ tracksRouter.get("/:id", (req, res) => {
                tracks.trackName,
                tracks.duration,
                albums.albumTitle AS albumTitle,
-               GROUP_CONCAT(artists.artistID) AS artistID,
-               GROUP_CONCAT(artists.name) AS artistName,
+               GROUP_CONCAT(artists.artistID) AS artistIDs,
+               GROUP_CONCAT(artists.name) AS artistNames,
                GROUP_CONCAT(artists.genres) AS artistGenres
         FROM tracks
         INNER JOIN track_albums ON tracks.trackID = track_albums.trackID
@@ -65,8 +65,8 @@ tracksRouter.get("/:id", (req, res) => {
                 res.status(404).json({ error: "Sangen blev ikke fundet." });
             } else {
                 const trackInfo = results[0];
-                trackInfo.artistID = trackInfo.artistID.split(",").map(Number);
-                trackInfo.artistName = trackInfo.artistName.split(",");
+                trackInfo.artistIDs = trackInfo.artistIDs.split(",").map(Number);
+                trackInfo.artistNames = trackInfo.artistNames.split(",");
                 trackInfo.artistGenres = trackInfo.artistGenres.split(",");
                 res.json(trackInfo);
             }
