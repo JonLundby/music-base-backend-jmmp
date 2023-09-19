@@ -6,12 +6,15 @@ import express from "express";
 import fs from "fs/promises";
 import cors from "cors";
 import connection from "./database.js";
+import artistsRouter from "./routes/artists.js";
 
 const app = express();
 const port = process.env.PORT || 3333;
 
 app.use(express.json());
 app.use(cors());
+
+app.use("/artists", artistsRouter);
 
 // ----- MAIN GET ----- \\
 app.get("/", (req, res) => {
@@ -32,9 +35,9 @@ app.get("/artists", async (request, response) => {
 });
 
 // GET specific artist
-app.get("/artists/:id", async (request, response) => {
-  const id = request.params.id;
-  const query = "SELECT * FROM artists WHERE id=?;";
+app.get("/artists/:artistId", async (request, response) => {
+  const id = request.params.artistId;
+  const query = "SELECT * FROM artists WHERE artistId=?;";
   const values = [id];
   connection.query(query, values, (err, results, fields) => {
     if (err) {
@@ -61,8 +64,8 @@ app.post("/artists", async (request, response) => {
 });
 
 // UPDATE artist
-app.put("/artists/:id", async (request, response) => {
-  const id = request.params.id;
+app.put("/artists/:artistId", async (request, response) => {
+  const id = request.params.artistId;
   const user = request.body;
   const query = "UPDATE artists SET name=?, birthdate=? WHERE id=?"; //todo add relevant properties
   const values = [user.name, user.birthdate, id]; //todo add relevant properties
@@ -77,9 +80,9 @@ app.put("/artists/:id", async (request, response) => {
 });
 
 //DELETE artists
-app.delete("/artists/:id", async (request, response) => {
-  const id = request.params.id;
-  const query = "DELETE FROM artists WHERE id=?;";
+app.delete("/artists/:artistId", async (request, response) => {
+  const id = request.params.artistId;
+  const query = "DELETE FROM artists WHERE artistId=?;";
   const values = [id];
   connection.query(query, values, (err, results, fields) => {
     if (err) {

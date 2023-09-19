@@ -1,5 +1,5 @@
 import { Router } from "express";
-import dbConnection from "../db-connect.js";
+import connection from "../database.js";
 
 const artistsRouter = Router();
 
@@ -9,7 +9,7 @@ artistsRouter.get("/", (request, response) => {
     SELECT * 
     FROM artists ORDER BY name;`;
 
-  dbConnection.query(queryString, (error, results) => {
+  connection.query(queryString, (error, results) => {
     if (error) {
       console.log(error);
     } else {
@@ -27,7 +27,7 @@ artistsRouter.get("/search", (request, response) => {
     WHERE name LIKE ?
     ORDER BY name`;
   const values = [`%${query}%`];
-  dbConnection.query(queryString, values, (error, results) => {
+  connection.query(queryString, values, (error, results) => {
     if (error) {
       console.log(error);
     } else {
@@ -37,14 +37,14 @@ artistsRouter.get("/search", (request, response) => {
 });
 
 // GET Endpoint "/artists/:id" - get one artist
-artistsRouter.get("/:id", (request, response) => {
-  const id = request.params.id;
+artistsRouter.get("/:artistId", (request, response) => {
+  const id = request.params.artistId;
   const queryString = /*sql*/ `
     SELECT * 
-    FROM artists WHERE id=?;`; // sql query
+    FROM artists WHERE artistId=?;`; // sql query
   const values = [id];
 
-  dbConnection.query(queryString, values, (error, results) => {
+  connection.query(queryString, values, (error, results) => {
     if (error) {
       console.log(error);
     } else {
@@ -70,7 +70,7 @@ artistsRouter.get("/:id/albums", (request, response) => {
 
   const values = [id];
 
-  dbConnection.query(queryString, values, (error, results) => {
+  connection.query(queryString, values, (error, results) => {
     if (error) {
       console.log(error);
     } else {
