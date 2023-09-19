@@ -1,6 +1,4 @@
 // -------------- ctr+f and search "todo" to find db deviations and other possible corrections -------------- \\
-// -------------- ctr+f and search "todo" to find db deviations and other possible corrections -------------- \\
-// -------------- ctr+f and search "todo" to find db deviations and other possible corrections -------------- \\
 
 import express from "express";
 import cors from "cors";

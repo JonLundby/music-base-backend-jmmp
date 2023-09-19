@@ -1,8 +1,8 @@
 // database name and password to be replaced
 
-import mysql2 from "mysql2";
+import mysql from "mysql2";
 
-const connection = mysql2.createConnection({
+const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
