@@ -35,63 +35,63 @@ app.get("/artists", async (request, response) => {
 });
 
 // GET specific artist
-app.get("/artists/:artistId", async (request, response) => {
-  const id = request.params.artistId;
-  const query = "SELECT * FROM artists WHERE artistId=?;";
-  const values = [id];
-  connection.query(query, values, (err, results, fields) => {
-    if (err) {
-      console.log(err);
-    } else {
-      response.json(results[0]); //[0] makes the return a single object instead of array with one object
-    }
-  });
-});
+// app.get("/artists/:artistId", async (request, response) => {
+//   const id = request.params.artistId;
+//   const query = "SELECT * FROM artists WHERE artistId=?;";
+//   const values = [id];
+//   connection.query(query, values, (err, results, fields) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       response.json(results[0]); //[0] makes the return a single object instead of array with one object
+//     }
+//   });
+// });
 
 // CREATE artist
-app.post("/artists", async (request, response) => {
-  const artist = request.body;
-  const query = "INSERT INTO artists(name, birthdate) values(?, ?);"; //todo add relevant properties
-  const values = [artist.name, artist.birthdate]; //todo add relevant properties
+// app.post("/artists", async (request, response) => {
+//   const artist = request.body;
+//   const query = "INSERT INTO artists(name, birthdate) values(?, ?);"; //todo add relevant properties
+//   const values = [artist.name, artist.birthdate]; //todo add relevant properties
 
-  connection.query(query, values, (err, results, fields) => {
-    if (err) {
-      console.log(err);
-    } else {
-      response.json(results);
-    }
-  });
-});
+//   connection.query(query, values, (err, results, fields) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       response.json(results);
+//     }
+//   });
+// });
 
 // UPDATE artist
-app.put("/artists/:artistId", async (request, response) => {
-  const id = request.params.artistId;
-  const user = request.body;
-  const query = "UPDATE artists SET name=?, birthdate=? WHERE id=?"; //todo add relevant properties
-  const values = [user.name, user.birthdate, id]; //todo add relevant properties
+// app.put("/artists/:artistId", async (request, response) => {
+//   const id = request.params.artistId;
+//   const user = request.body;
+//   const query = "UPDATE artists SET name=?, birthdate=? WHERE id=?"; //todo add relevant properties
+//   const values = [user.name, user.birthdate, id]; //todo add relevant properties
 
-  connection.query(query, values, (err, results, fields) => {
-    if (err) {
-      console.log(err);
-    } else {
-      response.json(results);
-    }
-  });
-});
+//   connection.query(query, values, (err, results, fields) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       response.json(results);
+//     }
+//   });
+// });
 
 //DELETE artists
-app.delete("/artists/:artistId", async (request, response) => {
-  const id = request.params.artistId;
-  const query = "DELETE FROM artists WHERE artistId=?;";
-  const values = [id];
-  connection.query(query, values, (err, results, fields) => {
-    if (err) {
-      console.log(err);
-    } else {
-      response.json(results);
-    }
-  });
-});
+// app.delete("/artists/:artistId", async (request, response) => {
+//   const id = request.params.artistId;
+//   const query = "DELETE FROM artists WHERE artistId=?;";
+//   const values = [id];
+//   connection.query(query, values, (err, results, fields) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       response.json(results);
+//     }
+//   });
+// });
 
 // ----- PORT LISTENER ----- \\
 app.listen(port, () => {

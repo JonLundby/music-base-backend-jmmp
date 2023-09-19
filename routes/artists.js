@@ -59,21 +59,70 @@ artistsRouter.get("/:artistId/albums", (request, response) => {
   const id = request.params.id;
 
   const queryString = /*sql*/ `
-        SELECT DISTINCT albums.*, 
-                        artists.name AS artistName,
+        SELECT DISTINCT albums.*,
+                        artists.artistName AS artistName,
                         artists.artistId AS artistId
         FROM albums
-        LEFT JOIN album_songs ON albums.id = album_songs.album_id
-        LEFT JOIN songs ON album_songs.song_id = songs.id
-        LEFT JOIN artists_songs ON songs.id = artists_songs.song_id
-        LEFT JOIN artists ON artists_songs.artist_id = artists.id
-        WHERE artists_songs.artist_id = ?;`;
+        JOIN album_song ON albums.albumID = album_song.albumId
+        JOIN songs ON album_song.songId = songs.songID
+        JOIN artist_song ON songs.songID = artist_song.songId
+        JOIN artists ON artist_song.artistId = artists.artistID
+        WHERE artist_song.artistId = ?;`;
 
   const values = [id];
 
+  console.log(queryString);
   connection.query(queryString, values, (error, results) => {
     if (error) {
       console.log(error);
+    } else {
+      console.log(results);
+      response.json(results);
+    }
+  });
+});
+
+// Skal nedenstående ikke også være i denne mappe?
+
+// CREATE artist
+artistsRouter.post("/artists", async (request, response) => {
+  const artist = request.body;
+  const query = "INSERT INTO artists(artistName) values(?);"; //todo add relevant properties
+  const values = [artist.artistName]; //todo add relevant properties
+
+  connection.query(query, values, (err, results, fields) => {
+    if (err) {
+      console.log(err);
+    } else {
+      response.json(results);
+    }
+  });
+});
+
+// UPDATE artist
+artistsRouter.put("/artists/:artistId", async (request, response) => {
+  const id = request.params.artistId;
+  const user = request.body;
+  const query = "UPDATE artists SET name=?, birthdate=? WHERE id=?"; //todo add relevant properties
+  const values = [user.name, user.birthdate, id]; //todo add relevant properties
+
+  connection.query(query, values, (err, results, fields) => {
+    if (err) {
+      console.log(err);
+    } else {
+      response.json(results);
+    }
+  });
+});
+
+//DELETE artists
+artistsRouter.delete("/artists/:artistId", async (request, response) => {
+  const id = request.params.artistId;
+  const query = "DELETE FROM artists WHERE artistId=?;";
+  const values = [id];
+  connection.query(query, values, (err, results, fields) => {
+    if (err) {
+      console.log(err);
     } else {
       response.json(results);
     }
