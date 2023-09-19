@@ -3,15 +3,16 @@
 // -------------- ctr+f and search "todo" to find db deviations and other possible corrections -------------- \\
 
 import express from "express";
-import fs from "fs/promises";
 import cors from "cors";
 import connection from "./database.js";
+import albumsRouter from "./routes/albums.js";
 
 const app = express();
 const port = process.env.PORT || 3333;
 
 app.use(express.json());
 app.use(cors());
+app.use("/albums", albumsRouter)
 
 // ----- MAIN GET ----- \\
 app.get("/", (req, res) => {
