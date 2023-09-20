@@ -3,7 +3,6 @@ import connection from "../database.js";
 
 const albumsRouter = Router();
 
-//CRUD
 // ----- ALBUM ROUTES ----- \\
 // GET Endpoint "/albums" - get all albums with artist information
 albumsRouter.get("/", (req, res) => {
@@ -13,25 +12,25 @@ albumsRouter.get("/", (req, res) => {
                albums.releaseDate,
                albums.albumTitle,
                albums.numberofTracks,
-               GROUP_CONCAT(artists.name) AS artistNames,
-               GROUP_CONCAT(artists.artistID) AS artistIDs,
-               GROUP_CONCAT(artists.genres) AS artistGenres
+               GROUP_CONCAT(tracks.trackName) AS trackNames,
+               GROUP_CONCAT(tracks.trackID) AS trackIDs
         FROM albums
-        INNER JOIN album_artists ON albums.albumID = album_artists.albumID
-        INNER JOIN artists ON album_artists.artistID = artists.artistID
+        INNER JOIN track_albums ON albums.albumID = track_albums.albumID
+        INNER JOIN tracks ON track_albums.trackID = tracks.trackID
         GROUP BY albums.albumID, albums.albumCover, albums.releaseDate, albums.albumTitle, albums.numberofTracks;
     `;
 
   connection.query(queryString, (err, results) => {
+    console.log(results)
     if (err) {
       console.log(err);
       res.status(500).json({ error: "Der opstod en fejl ved forespørgslen." });
     } else {
       // Process the artistNames, artistIDs, and artistGenres into arrays
       results.forEach((result) => {
-        result.artistNames = result.artistNames.split(",");
-        result.artistIDs = result.artistIDs.split(",").map(Number);
-        result.artistGenres = result.artistGenres.split(",");
+        result.trackNames = result.trackNames.split(",");
+        result.trackIDs = result.trackIDs.split(",").map(Number);
+        //result.artistGenres = result.artistGenres.split(",");
       });
 
       res.json(results);
@@ -40,43 +39,40 @@ albumsRouter.get("/", (req, res) => {
 });
 
 // GET Endpoint "/albums/:id" - get specific album by ID
-// albumsRouter.get("/:id", (req, res) => {
-//     const id = req.params.id;
-//     const queryString = /*sql*/ `
-//         SELECT tracks.trackID,
-//                tracks.trackName,
-//                tracks.duration,
-//                albums.albumTitle AS albumTitle,
-//                GROUP_CONCAT(artists.artistID) AS artistIDs,
-//                GROUP_CONCAT(artists.name) AS artistNames,
-//                GROUP_CONCAT(artists.genres) AS artistGenres
-//         FROM tracks
-//         INNER JOIN track_albums ON tracks.trackID = track_albums.trackID
-//         INNER JOIN albums ON track_albums.albumID = albums.albumID
-//         INNER JOIN track_artists ON tracks.trackID = track_artists.trackID
-//         INNER JOIN artists ON track_artists.artistID = artists.artistID
-//         WHERE tracks.trackID = ?
-//         GROUP BY tracks.trackID, tracks.trackName, tracks.duration, albums.albumTitle;
-//     `;
-//     const values = [id];
+albumsRouter.get("/:id", (req, res) => {
+    const id = req.params.id;
+    const queryString = /*sql*/ `
+        SELECT albums.albumID,
+               albums.albumCover,
+               albums.releaseDate,
+               albums.albumTitle,
+               albums.numberofTracks,
+               GROUP_CONCAT(tracks.trackName) AS trackNames,
+               GROUP_CONCAT(tracks.trackID) AS trackIDs
+        FROM albums
+        INNER JOIN track_albums ON albums.albumID = track_albums.albumID
+        INNER JOIN tracks ON track_albums.trackID = tracks.trackID
+        WHERE albums.albumID = ?
+        GROUP BY albums.albumID, albums.albumCover, albums.releaseDate, albums.albumTitle, albums.numberofTracks;
+    `;
+    const values = [id];
 
-//     connection.query(queryString, values, (err, results) => {
-//         if (err) {
-//             console.error(err);
-//             res.status(500).json({ error: "Der opstod en fejl under forespørgslen." });
-//         } else {
-//             if (results.length === 0) {
-//                 res.status(404).json({ error: "Sangen blev ikke fundet." });
-//             } else {
-//                 const trackInfo = results[0];
-//                 trackInfo.artistIDs = trackInfo.artistIDs.split(",").map(Number);
-//                 trackInfo.artistNames = trackInfo.artistNames.split(",");
-//                 trackInfo.artistGenres = trackInfo.artistGenres.split(",");
-//                 res.json(trackInfo);
-//             }
-//         }
-//     });
-// });
+  connection.query(queryString, values, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Der opstod en fejl under forespørgslen." });
+        } else {
+            if (results.length === 0) {
+                res.status(404).json({ error: "Albummet blev ikke fundet." });
+            } else {
+                const albumInfo = results[0];
+                albumInfo.trackIDs = albumInfo.trackIDs.split(",").map(Number);
+                albumInfo.trackNames = albumInfo.trackNames.split(",");
+                res.json(albumInfo);
+            }
+        }
+    });
+});
 
 // CREATE album
 albumsRouter.post("/", async (request, response) => {
