@@ -168,4 +168,55 @@ tracksRouter.put("/:id", (req, res) => {
     });
 });
 
+// DELETE Endpoint "/tracks/:id" - delete specific song by ID
+tracksRouter.delete("/:id", (req, res) => {
+    const id = req.params.id;
+
+    // 1. Slet alle relationer til sangen fra track_artists-tabellen
+    const deleteTrackArtistsQuery = /*sql*/ `
+        DELETE FROM track_artists
+        WHERE trackID = ?;
+    `;
+
+    connection.query(deleteTrackArtistsQuery, [id], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-kunstnerrelationer." });
+        } else {
+            // 2. Slet alle relationer til sangen fra track_albums-tabellen
+            const deleteTrackAlbumsQuery = /*sql*/ `
+                DELETE FROM track_albums
+                WHERE trackID = ?;
+            `;
+
+            connection.query(deleteTrackAlbumsQuery, [id], (err, result) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-albumrelationer." });
+                } else {
+                    // 3. Slet sangen fra tracks-tabellen
+                    const deleteTrackQuery = /*sql*/ `
+                        DELETE FROM tracks
+                        WHERE trackID = ?;
+                    `;
+
+                    connection.query(deleteTrackQuery, [id], (err, result) => {
+                        if (err) {
+                            console.error(err);
+                            res.status(500).json({ error: "Der opstod en fejl ved sletning af sangen." });
+                        } else {
+                            if (result.affectedRows === 0) {
+                                res.status(404).json({ error: "Sangen blev ikke fundet." });
+                            } else {
+                                // 4. Send en bekræftelsesbesked
+                                res.json({ message: "Sangen blev slettet med succes." });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+
 export default tracksRouter;
