@@ -5,6 +5,7 @@ import cors from "cors";
 // Imports from routes
 //import tracksRouter from "./routes/tracks.js";
 import albumsRouter from "./routes/albums.js";
+import tracksRouter from "./routes/tracks.js";
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -15,6 +16,7 @@ app.use(cors());
 // ROUTERS
 //app.use("/tracks", tracksRouter);
 app.use("/albums", albumsRouter);
+app.use("/tracks", tracksRouter);
 
 // ----- MAIN GET ----- \\
 app.get("/", (req, res) => {
