@@ -39,7 +39,6 @@ tracksRouter.get("/", (req, res) => {
 });
 
 // GET Endpoint "/tracks/:id" - get specific song by ID
-// GET Endpoint "/tracks/:id" - get specific song by ID
 tracksRouter.get("/:id", (req, res) => {
     const id = req.params.id;
     const queryString = /*sql*/ `
@@ -76,6 +75,59 @@ tracksRouter.get("/:id", (req, res) => {
                 res.json(trackInfo);
             }
         }
+    });
+});
+
+// POST Endpoint "/tracks" - add a new song to the database
+tracksRouter.post("/", (req, res) => {
+    const { trackName, duration, albumID, artistIDs } = req.body;
+
+    // Insert the new song into the 'tracks' table
+    const insertTrackQuery = /*sql*/ `
+      INSERT INTO tracks (trackName, duration)
+      VALUES (?, ?);
+    `;
+
+    connection.query(insertTrackQuery, [trackName, duration], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Fejl ved oprettelse af sangen." });
+            return;
+        }
+
+        const trackID = result.insertId;
+
+        // Insert the song's album relationship into the 'track_albums' table
+        const insertTrackAlbumsQuery = /*sql*/ `
+        INSERT INTO track_albums (trackID, albumID)
+        VALUES (?, ?);
+      `;
+
+        connection.query(insertTrackAlbumsQuery, [trackID, albumID], (err, result) => {
+            if (err) {
+                console.error(err);
+                res.status(500).json({ error: "Fejl ved oprettelse af sangens albumrelation." });
+                return;
+            }
+
+            // Insert the song's artist relationships into the 'track_artists' table
+            const insertTrackArtistsQuery = /*sql*/ `
+          INSERT INTO track_artists (trackID, artistID)
+          VALUES ?;
+        `;
+
+            const trackArtistsValues = artistIDs.map((artistID) => [trackID, artistID]);
+
+            connection.query(insertTrackArtistsQuery, [trackArtistsValues], (err, result) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ error: "Fejl ved oprettelse af sangens kunstnerrelationer." });
+                    return;
+                }
+
+                res.status(201).json({ message: "Sangen er blevet tilføjet med succes." });
+            });
+        });
     });
 });
 
