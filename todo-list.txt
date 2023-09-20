@@ -14,6 +14,9 @@
 
 ❌ - deploy appen på azure
 
+ -  søgefunktion i frontend skal bruge junctiontabels (magnus) Done
+
+
 
 
 link til RACE eksempel: https://github.com/cederdorff/musicbase-backend/tree/many-to-many
