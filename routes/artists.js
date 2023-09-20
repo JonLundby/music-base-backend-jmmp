@@ -25,7 +25,7 @@ artistsRouter.get("/search", (request, response) => {
   const queryString = /*sql*/ `
     SELECT * 
     FROM artists
-    WHERE name LIKE ?
+    WHERE artistName LIKE ?
     ORDER BY name`;
   const values = [`%${query}%`];
   connection.query(queryString, values, (error, results) => {
