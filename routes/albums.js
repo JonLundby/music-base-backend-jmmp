@@ -24,9 +24,7 @@ const albumsRouter = Router();
 //     });
 // });
 
-
 //get single album
-
 
 //get single album with songs
 
@@ -37,15 +35,15 @@ albumsRouter.get("/", (req, res) => {
         SELECT albums.albumID,
                albums.albumCover,
                albums.releaseDate,
-               albums.abumTitle,
-               albums.numberofTracks
+               albums.albumTitle,
+               albums.numberofTracks,
                GROUP_CONCAT(artists.name) AS artistNames,
                GROUP_CONCAT(artists.artistID) AS artistIDs,
                GROUP_CONCAT(artists.genres) AS artistGenres
         FROM albums
-        INNER JOIN album_artists ON tracks.albumID = album_artists.albumID
+        INNER JOIN album_artists ON albums.albumID = album_artists.albumID
         INNER JOIN artists ON album_artists.artistID = artists.artistID
-        GROUP BY albums.albumID, albums.albumCover, albums.releaseDate, albums.abumTitle, albums.numberofTracks;
+        GROUP BY albums.albumID, albums.albumCover, albums.releaseDate, albums.albumTitle, albums.numberofTracks;
     `;
 
   connection.query(queryString, (err, results) => {
