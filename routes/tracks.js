@@ -9,13 +9,16 @@ tracksRouter.get("/", (req, res) => {
         SELECT tracks.trackID,
                tracks.trackName,
                tracks.duration,
+               albums.albumID AS albumID,  -- Include albumID in the SELECT statement
                GROUP_CONCAT(artists.name) AS artistNames,
                GROUP_CONCAT(artists.artistID) AS artistIDs,
                GROUP_CONCAT(artists.genres) AS artistGenres
         FROM tracks
         INNER JOIN track_artists ON tracks.trackID = track_artists.trackID
+        INNER JOIN track_albums ON tracks.trackID = track_albums.trackID
+        INNER JOIN albums ON track_albums.albumID = albums.albumID
         INNER JOIN artists ON track_artists.artistID = artists.artistID
-        GROUP BY tracks.trackID, tracks.trackName, tracks.duration;
+        GROUP BY tracks.trackID, tracks.trackName, tracks.duration, albums.albumID;
     `;
 
     connection.query(queryString, (err, results) => {
@@ -36,6 +39,7 @@ tracksRouter.get("/", (req, res) => {
 });
 
 // GET Endpoint "/tracks/:id" - get specific song by ID
+// GET Endpoint "/tracks/:id" - get specific song by ID
 tracksRouter.get("/:id", (req, res) => {
     const id = req.params.id;
     const queryString = /*sql*/ `
@@ -43,6 +47,7 @@ tracksRouter.get("/:id", (req, res) => {
                tracks.trackName,
                tracks.duration,
                albums.albumTitle AS albumTitle,
+               albums.albumID AS albumID,  -- Include albumID in the SELECT statement
                GROUP_CONCAT(artists.artistID) AS artistIDs,
                GROUP_CONCAT(artists.name) AS artistNames,
                GROUP_CONCAT(artists.genres) AS artistGenres
@@ -52,7 +57,7 @@ tracksRouter.get("/:id", (req, res) => {
         INNER JOIN track_artists ON tracks.trackID = track_artists.trackID
         INNER JOIN artists ON track_artists.artistID = artists.artistID
         WHERE tracks.trackID = ?
-        GROUP BY tracks.trackID, tracks.trackName, tracks.duration, albums.albumTitle;
+        GROUP BY tracks.trackID, tracks.trackName, tracks.duration, albums.albumTitle, albums.albumID;
     `;
     const values = [id];
 
@@ -71,6 +76,95 @@ tracksRouter.get("/:id", (req, res) => {
                 res.json(trackInfo);
             }
         }
+    });
+});
+
+// PUT Endpoint "/tracks/:id" - update specific song by ID
+tracksRouter.put("/:id", (req, res) => {
+    // Start en SQL-transaktion
+    connection.beginTransaction((err) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: "Fejl ved oprettelse af nye sang-kunstnerrelationer." });
+            return;
+        }
+
+        const trackID = req.params.id;
+        const { trackName, duration, artistIDs } = req.body;
+
+        // Først opdaterer vi sangens oplysninger
+        const updateTrackQuery = /*sql*/ `
+      UPDATE tracks
+      SET trackName = ?, duration = ?
+      WHERE trackID = ?;
+    `;
+
+        connection.query(updateTrackQuery, [trackName, duration, trackID], (err, results) => {
+            if (err) {
+                console.error(err);
+                // Rul transaktionen tilbage i tilfælde af en fejl
+                connection.rollback(() => {
+                    res.status(500).json({ error: "Fejl ved opdatering af sangoplysninger." });
+                });
+                return;
+            }
+
+            // Slet alle eksisterende relationer mellem sangen og kunstnerne, der ikke er inkluderet i PUT-anmodningen
+            const deleteTrackArtistsQuery = /*sql*/ `
+        DELETE FROM track_artists
+        WHERE trackID = ? AND artistID NOT IN (?);
+      `;
+
+            connection.query(deleteTrackArtistsQuery, [trackID, artistIDs], (err, results) => {
+                if (err) {
+                    console.error(err);
+                    // Rul transaktionen tilbage i tilfælde af en fejl
+                    connection.rollback(() => {
+                        res.status(500).json({ error: "Fejl ved sletning af kunstnerrelationer." });
+                    });
+                    return;
+                }
+
+                // Nu indsætter vi de nye relationer mellem sangen og kunstnerne
+                const insertTrackArtistsQuery = /*sql*/ `
+          INSERT IGNORE INTO track_artists (trackID, artistID)
+          VALUES (?, ?);
+        `;
+
+                // Brug løkke til at indsætte relationer for hvert artistID i PUT-anmodningen
+                artistIDs.forEach((artistID) => {
+                    connection.query(insertTrackArtistsQuery, [trackID, artistID], (err, results) => {
+                        if (err) {
+                            console.error(err);
+                            // Ignorer duplikatindsættelsesfejl, men log andre fejl
+                            if (err.code !== "ER_DUP_ENTRY") {
+                                // Rul transaktionen tilbage i tilfælde af en fejl
+                                connection.rollback(() => {
+                                    res.status(500).json({
+                                        error: "Fejl ved oprettelse af nye sang-kunstnerrelationer.",
+                                    });
+                                });
+                                return;
+                            }
+                        }
+                    });
+                });
+
+                // Udfør transaktionen
+                connection.commit((err) => {
+                    if (err) {
+                        console.error(err);
+                        // Rul transaktionen tilbage i tilfælde af en fejl
+                        connection.rollback(() => {
+                            res.status(500).json({ error: "Fejl ved gennemførelse af transaktionen." });
+                        });
+                        return;
+                    }
+
+                    res.json({ message: "Sangen blev opdateret med succes." });
+                });
+            });
+        });
     });
 });
 
