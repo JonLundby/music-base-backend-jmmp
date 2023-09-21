@@ -9,7 +9,7 @@ tracksRouter.get("/", (req, res) => {
         SELECT tracks.trackID,
                tracks.trackName,
                tracks.duration,
-               albums.albumID AS albumID,  -- Include albumID in the SELECT statement
+               albums.albumID AS albumID,
                GROUP_CONCAT(artists.name) AS artistNames,
                GROUP_CONCAT(artists.artistID) AS artistIDs,
                GROUP_CONCAT(artists.genres) AS artistGenres
