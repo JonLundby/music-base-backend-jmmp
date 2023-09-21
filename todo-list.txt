@@ -6,7 +6,7 @@
 
 ❌ - lav routes mappe til artists (Palle)
 
-❌ - lav routes mappe til albums (Jon)
+✅ - lav routes mappe til albums (Jon)
 
 ❌ - lav en route der joiner albums med tracks
 
