@@ -82,7 +82,13 @@ artistsRouter.get("/", async (request, response) => {
     if (err) {
       console.log(err);
     } else {
-      response.json(results);
+      // Modify the birthdate format in the results
+      const modifiedResults = results.map((artist) => ({
+        ...artist,
+        birthdate: artist.birthdate.toISOString().split("T")[0], // Remove time and "Z"
+      }));
+
+      response.json(modifiedResults);
     }
   });
 });
