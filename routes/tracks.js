@@ -233,7 +233,9 @@ tracksRouter.delete("/:id", (req, res) => {
     connection.query(deleteTrackArtistsQuery, [id], (err, result) => {
         if (err) {
             console.error(err);
-            res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-kunstnerrelationer." });
+            connection.rollback(() => {
+                res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-kunstnerrelationer." });
+            });
         } else {
             // 2. Slet alle relationer til sangen fra track_albums-tabellen
             const deleteTrackAlbumsQuery = /*sql*/ `
@@ -244,7 +246,9 @@ tracksRouter.delete("/:id", (req, res) => {
             connection.query(deleteTrackAlbumsQuery, [id], (err, result) => {
                 if (err) {
                     console.error(err);
-                    res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-albumrelationer." });
+                    connection.rollback(() => {
+                        res.status(500).json({ error: "Der opstod en fejl ved sletning af sang-albumrelationer." });
+                    });
                 } else {
                     // 3. Slet sangen fra tracks-tabellen
                     const deleteTrackQuery = /*sql*/ `
@@ -255,10 +259,14 @@ tracksRouter.delete("/:id", (req, res) => {
                     connection.query(deleteTrackQuery, [id], (err, result) => {
                         if (err) {
                             console.error(err);
-                            res.status(500).json({ error: "Der opstod en fejl ved sletning af sangen." });
+                            connection.rollback(() => {
+                                res.status(500).json({ error: "Der opstod en fejl ved sletning af sangen." });
+                            });
                         } else {
                             if (result.affectedRows === 0) {
-                                res.status(404).json({ error: "Sangen blev ikke fundet." });
+                                connection.rollback(() => {
+                                    res.status(404).json({ error: "Sangen blev ikke fundet." });
+                                });
                             } else {
                                 // 4. Send en bekræftelsesbesked
                                 res.json({ message: "Sangen blev slettet med succes." });
