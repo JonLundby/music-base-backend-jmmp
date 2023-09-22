@@ -3,6 +3,8 @@ import connection from "../database.js";
 
 const albumsRouter = Router();
 
+//CRUD
+// ----- ALBUM ROUTES ----- \\
 // GET Endpoint "/albums" - get all albums with artist information
 albumsRouter.get("/", (req, res) => {
   const queryString = /*sql*/ `
@@ -33,20 +35,6 @@ albumsRouter.get("/", (req, res) => {
       });
 
       res.json(results);
-    }
-  });
-});
-
-//CRUD
-// ----- ALBUM ROUTES ----- \\
-// GET all albums
-albumsRouter.get("/", async (request, response) => {
-  const query = "SELECT * FROM albums;";
-  connection.query(query, (err, results, fields) => {
-    if (err) {
-      console.log(err);
-    } else {
-      response.json(results);
     }
   });
 });
