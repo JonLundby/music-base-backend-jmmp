@@ -8,6 +8,18 @@ I dette projekt har vi lavet et program bestående af to programmer, et backend 
 
 Det er så muligt i vores [frontend program](https://jonlundby.github.io/music-base-frontend-jmmp/) få dataen fra databasen gennem backend og vise det. I frontend kan du så søge på både albums, artists & tracks. Hvis du vil vide mere omkring de forskellige tabeller, kan du hover musen og et element og få hvis, hvad det indeholder.
 
+## Indhold
+
+1. [Installation af backend](#installation-af-backend)
+2. [Installation af nødvendige packages](#installation-af-nødvendige-packages)
+3. [Benyttelse af backend](#benyttelse-af-backend)
+
+    - [Opsætning af dotenv](#opsætning-af-dotenv)
+    - [Struktur af MySQL database](#struktur-af-mysql-database)
+    - [Kør programmet](#kør-program)
+
+4. [Slutning](#slutning)
+
 ## Installation af backend
 
 For at clone projektet så du selv kan arbejde med det, så er det vigtig at du har [git](https://git-scm.com/downloads), inden du starter. Når du har det kan du følge guiden nedenfor:
@@ -36,17 +48,19 @@ cd /music-base-backend-jmmp
 
 ## Installation af nødvendige packages
 
-EFter
+Efter du har clonet programmet, og inden du kan køre det, så er det vigtigt at du også downloader de `node packages` som programmet bruger. For at gøre dette skal du åbne terminalen, og køre følgende kommando
 
 ```bash
 npm i cors express mysql2 dotenv
 ```
 
+Du skulle nu gerne kunne se en ny mappe `node_modules`. Det er i denne mappe at du nu har installeret de nødvendige packages, som programmet bruger.
+
 ## Benyttelse af backend
 
 Efter du nu har fået downloaded de nødvendige packages, så er du klar til at kunne køre node backend app'en lokalt.
 
-#### Opsætning af dotenv
+### Opsætning af dotenv
 
 Udover bare at installer et par node packages, så skal du også lave `dotenv` fil. Til at gøre dette kan du skrive følgende i din terminal:
 
@@ -57,15 +71,96 @@ touch .env
 Den nye fil du har lavet skal du bruge til at kunne connecte til den brugte database til projektet. For at kunne gøre dette skal du sætte følgende værdier ind:
 
 ```javaScript
-MYSQL_HOST=Database url
-MYSQL_DATABASE=Den valgte database fil
+MYSQL_HOST=localhost
+MYSQL_DATABASE=musicbase_db
 MYSQL_PASSWORD=kodeord til databasen
-MYSQL_USER=navn på bruger
+MYSQL_USER=root
 MYSQL_PORT=3306
-SERVER_PORT=3333
 ```
 
 Du skulle gerne nu kunne forbinde til databasen.
+
+#### Struktur af MySQL database
+
+nedenfor er struktur for hvordan vores database ser ud.
+
+```sql
+create database musicbase_db
+
+create table if not exists albums
+(
+    albumID        int auto_increment
+        primary key,
+    albumCover     varchar(255) null,
+    releaseDate    varchar(255) null,
+    albumTitle     varchar(255) null,
+    numberofTracks int          null
+);
+
+create table if not exists artists
+(
+    artistID       int auto_increment
+        primary key,
+    name           varchar(255) null,
+    birthdate      date         null,
+    genres         varchar(255) null,
+    website        varchar(255) null,
+    image          varchar(255) null,
+    numberOfAlbums int          null
+);
+
+create table if not exists album_artists
+(
+    albumID  int not null,
+    artistID int not null,
+    primary key (albumID, artistID),
+    constraint album_artists_ibfk_1
+        foreign key (albumID) references albums (albumID),
+    constraint album_artists_ibfk_2
+        foreign key (artistID) references artists (artistID)
+);
+
+create index artistID
+    on album_artists (artistID);
+
+create table if not exists tracks
+(
+    trackID   int auto_increment
+        primary key,
+    trackName varchar(255) null,
+    duration  time         null
+);
+
+create table if not exists track_albums
+(
+    trackID int not null,
+    albumID int not null,
+    primary key (trackID, albumID),
+    constraint track_albums_ibfk_1
+        foreign key (trackID) references tracks (trackID),
+    constraint track_albums_ibfk_2
+        foreign key (albumID) references albums (albumID)
+);
+
+create index albumID
+    on track_albums (albumID);
+
+create table if not exists track_artists
+(
+    trackID  int not null,
+    artistID int not null,
+    primary key (trackID, artistID),
+    constraint track_artists_ibfk_1
+        foreign key (trackID) references tracks (trackID),
+    constraint track_artists_ibfk_2
+        foreign key (artistID) references artists (artistID)
+);
+
+create index artistID
+    on track_artists (artistID);
+
+
+```
 
 ### Kør program
 
@@ -90,3 +185,5 @@ npm run watch
 ## Slutning
 
 **Tillykke du har nu clonet og kan køre backend programmet! 🎉**
+
+_Dette program er udarbejdet af Jon, Magnus, Markus & Palle Dat23V2._
