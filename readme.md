@@ -4,9 +4,9 @@
 
 # SQL og databaser
 
-I dette projekt har vi lavet et program bestående af to programmer, et backend og [frontend program](). I backend programmet tilgåes der en MySQL database, hvor det gøres muligt at kunne manipulere 3 overordnet tabeller. Tabellerne er det overordnet databefinder sig er en albums, artists og tracks tabel. Det er muligt i de tre tabeller at kunne foretage de 4 CRUD funktioner `Create, Read, Update, Delete`.
+I dette projekt har vi lavet et program bestående af to programmer, et backend og [frontend program](https://jonlundby.github.io/music-base-frontend-jmmp/). I backend programmet tilgåes der en MySQL database, hvor det gøres muligt at kunne manipulere 3 overordnet tabeller. Tabellerne er det overordnet databefinder sig er en albums, artists og tracks tabel. Det er muligt i de tre tabeller at kunne foretage de 4 CRUD funktioner `Create, Read, Update, Delete`.
 
-Det er så muligt i vores [frontend program]() få dataen fra databasen gennem backend og vise det. I frontend kan du så søge på både albums, artists & tracks. Hvis du vil vide mere omkring de forskellige tabeller, kan du hover musen og et element og få hvis, hvad det indeholder.
+Det er så muligt i vores [frontend program](https://jonlundby.github.io/music-base-frontend-jmmp/) få dataen fra databasen gennem backend og vise det. I frontend kan du så søge på både albums, artists & tracks. Hvis du vil vide mere omkring de forskellige tabeller, kan du hover musen og et element og få hvis, hvad det indeholder.
 
 ## Installation af backend
 
