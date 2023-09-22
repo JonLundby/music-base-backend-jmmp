@@ -3,32 +3,6 @@ import connection from "../database.js";
 
 const albumsRouter = Router();
 
-// get all albums (MOST LIKELY NOT WORKING PROPERLY)
-// albumsRouter.get("/", (request, response) => {
-//     const queryString = /*sql*/ `
-//             SELECT DISTINCT albums.*,
-//                 artists.name AS artistName,
-//                 artists.artistID AS artistId
-//             FROM albums
-//             JOIN track_albums ON albums.albumID = track_albums.albumID
-//             JOIN tracks ON track_albums.trackID = tracks.trackID
-//             JOIN track_artists ON tracks.trackID = track_artists.trackID
-//             JOIN artists ON track_artists.artistID = artists.artistID;
-//     `;
-//     connection.query(queryString, (error, results) => {
-//       if (error) {
-//         console.log(error);
-//       } else {
-//         response.json(results);
-//       }
-//     });
-// });
-
-//get single album
-
-//get single album with songs
-
-//############ get albums test start ############ \\
 // GET Endpoint "/albums" - get all albums with artist information
 albumsRouter.get("/", (req, res) => {
   const queryString = /*sql*/ `
@@ -62,47 +36,6 @@ albumsRouter.get("/", (req, res) => {
     }
   });
 });
-
-// GET Endpoint "/tracks/:id" - get specific song by ID
-// tracksRouter.get("/:id", (req, res) => {
-//     const id = req.params.id;
-//     const queryString = /*sql*/ `
-//         SELECT tracks.trackID,
-//                tracks.trackName,
-//                tracks.duration,
-//                albums.albumTitle AS albumTitle,
-//                GROUP_CONCAT(artists.artistID) AS artistIDs,
-//                GROUP_CONCAT(artists.name) AS artistNames,
-//                GROUP_CONCAT(artists.genres) AS artistGenres
-//         FROM tracks
-//         INNER JOIN track_albums ON tracks.trackID = track_albums.trackID
-//         INNER JOIN albums ON track_albums.albumID = albums.albumID
-//         INNER JOIN track_artists ON tracks.trackID = track_artists.trackID
-//         INNER JOIN artists ON track_artists.artistID = artists.artistID
-//         WHERE tracks.trackID = ?
-//         GROUP BY tracks.trackID, tracks.trackName, tracks.duration, albums.albumTitle;
-//     `;
-//     const values = [id];
-
-//     connection.query(queryString, values, (err, results) => {
-//         if (err) {
-//             console.error(err);
-//             res.status(500).json({ error: "Der opstod en fejl under forespørgslen." });
-//         } else {
-//             if (results.length === 0) {
-//                 res.status(404).json({ error: "Sangen blev ikke fundet." });
-//             } else {
-//                 const trackInfo = results[0];
-//                 trackInfo.artistIDs = trackInfo.artistIDs.split(",").map(Number);
-//                 trackInfo.artistNames = trackInfo.artistNames.split(",");
-//                 trackInfo.artistGenres = trackInfo.artistGenres.split(",");
-//                 res.json(trackInfo);
-//             }
-//         }
-//     });
-// });
-
-//############ get albums test slut ############ \\
 
 //CRUD
 // ----- ALBUM ROUTES ----- \\
